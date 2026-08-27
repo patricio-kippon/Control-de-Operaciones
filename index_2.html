@@ -1,0 +1,862 @@
+<title>Operaciones Kippon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@500;600&display=swap">
+
+<style>
+:root{
+  --ground:#EDEFF3; --surface:#FFFFFF; --surface-2:#F7F8FB; --surface-3:#F1F3F7;
+  --line:#DDE1E9; --line-soft:#E8EBF1;
+  --ink:#131A24; --ink-2:#4B5668; --ink-3:#7C8698;
+  --accent:#123A63; --accent-soft:#E3EAF3; --accent-ink:#123A63;
+  --brass:#8A6420;
+  --st-neutro-bg:#E9ECF1; --st-neutro-fg:#5C6779;
+  --st-curso-bg:#FBEBC8;  --st-curso-fg:#7F5606;
+  --st-tercero-bg:#E8DEF8;--st-tercero-fg:#573793;
+  --st-listo-bg:#D8E4F7;  --st-listo-fg:#17457F;
+  --st-ok-bg:#D8EBDA;     --st-ok-fg:#1C6033;
+  --st-alto-bg:#F8DCD5;   --st-alto-fg:#953019;
+  --shadow:0 1px 2px rgba(19,26,36,.05), 0 8px 24px -18px rgba(19,26,36,.35);
+  --radius:10px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0E131A; --surface:#161C25; --surface-2:#1B222D; --surface-3:#202834;
+    --line:#2A3340; --line-soft:#232B37;
+    --ink:#E9EDF4; --ink-2:#A8B3C3; --ink-3:#78838F;
+    --accent:#89B0DC; --accent-soft:#1B2735; --accent-ink:#9CC0E8;
+    --brass:#C9A05A;
+    --st-neutro-bg:#242C37; --st-neutro-fg:#98A3B3;
+    --st-curso-bg:#3A2F13;  --st-curso-fg:#E7C070;
+    --st-tercero-bg:#2E2445;--st-tercero-fg:#C5ABF2;
+    --st-listo-bg:#1C2C45;  --st-listo-fg:#97BDEE;
+    --st-ok-bg:#17301F;     --st-ok-fg:#89CA9D;
+    --st-alto-bg:#3A211B;   --st-alto-fg:#EFA58F;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -20px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0E131A; --surface:#161C25; --surface-2:#1B222D; --surface-3:#202834;
+  --line:#2A3340; --line-soft:#232B37;
+  --ink:#E9EDF4; --ink-2:#A8B3C3; --ink-3:#78838F;
+  --accent:#89B0DC; --accent-soft:#1B2735; --accent-ink:#9CC0E8;
+  --brass:#C9A05A;
+  --st-neutro-bg:#242C37; --st-neutro-fg:#98A3B3;
+  --st-curso-bg:#3A2F13;  --st-curso-fg:#E7C070;
+  --st-tercero-bg:#2E2445;--st-tercero-fg:#C5ABF2;
+  --st-listo-bg:#1C2C45;  --st-listo-fg:#97BDEE;
+  --st-ok-bg:#17301F;     --st-ok-fg:#89CA9D;
+  --st-alto-bg:#3A211B;   --st-alto-fg:#EFA58F;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -20px rgba(0,0,0,.8);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:14px; line-height:1.5; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1320px; margin:0 auto; padding:28px 24px 72px; display:flex; flex-direction:column; gap:22px}
+h1,h2,h3{margin:0; font-family:"IBM Plex Serif",Georgia,serif; font-weight:600; text-wrap:balance}
+.num{font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums}
+.eyebrow{font-size:11px; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-3); font-weight:600}
+
+/* ---------- encabezado ---------- */
+header.top{display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:16px}
+header.top h1{font-size:27px; letter-spacing:-.01em}
+header.top .sub{color:var(--ink-2); font-size:13px; margin-top:4px}
+.filebar{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+.filechip{
+  display:flex; align-items:center; gap:8px; background:var(--surface); border:1px solid var(--line);
+  border-radius:999px; padding:6px 14px; font-size:12px; color:var(--ink-2); box-shadow:var(--shadow);
+}
+.filechip .dot{width:7px; height:7px; border-radius:50%; background:var(--accent)}
+.btn{
+  font:inherit; font-size:13px; font-weight:600; color:#fff; background:var(--accent);
+  border:1px solid transparent; border-radius:8px; padding:9px 16px; cursor:pointer;
+  transition:filter .15s ease, transform .15s ease;
+}
+:root[data-theme="dark"] .btn, :root:not([data-theme="light"]) .btn{color:#0E131A}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]) .btn{color:#fff}}
+.btn:hover{filter:brightness(1.08)}
+.btn:active{transform:translateY(1px)}
+.btn.ghost{background:var(--surface); color:var(--ink-2); border-color:var(--line)}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:6px}
+
+/* ---------- tarjetas kpi ---------- */
+.kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(158px,1fr)); gap:12px}
+.kpi{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px 15px; box-shadow:var(--shadow)}
+.kpi .k{font-size:11px; letter-spacing:.07em; text-transform:uppercase; color:var(--ink-3); font-weight:600}
+.kpi .v{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums; font-size:27px; font-weight:600; margin-top:6px; letter-spacing:-.02em}
+.kpi .n{font-size:11.5px; color:var(--ink-3); margin-top:2px}
+.kpi.lead{background:var(--accent); border-color:var(--accent); color:#fff}
+:root[data-theme="dark"] .kpi.lead, :root:not([data-theme="light"]) .kpi.lead{color:#0E131A}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]) .kpi.lead{color:#fff}}
+.kpi.lead .k,.kpi.lead .n{color:inherit; opacity:.72}
+
+/* ---------- paneles ---------- */
+.panels{display:grid; grid-template-columns:minmax(0,1.15fr) minmax(0,1fr); gap:16px}
+@media (max-width:900px){.panels{grid-template-columns:1fr}}
+.card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden}
+.card > .head{padding:15px 18px 12px; border-bottom:1px solid var(--line-soft); display:flex; align-items:baseline; justify-content:space-between; gap:12px}
+.card > .head h2{font-size:15px}
+.card > .body{padding:14px 18px 18px}
+
+/* barras por etapa */
+.stage{display:grid; grid-template-columns:150px minmax(0,1fr) auto; align-items:center; gap:12px; padding:5px 0}
+.stage .lbl{font-size:12.5px; color:var(--ink-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.track{height:9px; background:var(--surface-3); border-radius:5px; overflow:hidden}
+.fill{height:100%; background:var(--accent); border-radius:5px; transition:width .5s cubic-bezier(.2,.7,.3,1)}
+.stage .val{font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--ink-2); font-variant-numeric:tabular-nums; white-space:nowrap}
+.stage.zero .lbl,.stage.zero .val{color:var(--ink-3)}
+
+/* proveedores */
+.prov-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:18px}
+.prov-grid h3{font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); font-family:"IBM Plex Sans",sans-serif; font-weight:600; margin-bottom:9px}
+.prov{display:flex; align-items:baseline; justify-content:space-between; gap:10px; padding:5px 0; border-bottom:1px dashed var(--line-soft)}
+.prov:last-child{border-bottom:0}
+.prov .nm{font-size:13px; font-weight:500}
+.prov .mt{font-family:"IBM Plex Mono",monospace; font-size:11.5px; color:var(--ink-3); font-variant-numeric:tabular-nums}
+
+/* ---------- controles ---------- */
+.controls{display:flex; flex-wrap:wrap; align-items:center; gap:10px}
+.search{
+  flex:1 1 220px; min-width:180px; background:var(--surface); border:1px solid var(--line); border-radius:8px;
+  padding:9px 13px; font:inherit; font-size:13px; color:var(--ink);
+}
+.search::placeholder{color:var(--ink-3)}
+.seg{display:flex; background:var(--surface); border:1px solid var(--line); border-radius:8px; overflow:hidden}
+.seg button{font:inherit; font-size:12.5px; padding:8px 13px; background:transparent; border:0; color:var(--ink-2); cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent-soft); color:var(--accent-ink); font-weight:600}
+.toggle{display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--ink-2); background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:8px 13px; cursor:pointer}
+.toggle input{accent-color:var(--accent); margin:0}
+
+/* ---------- tabla ---------- */
+.tablewrap{overflow-x:auto}
+table{width:100%; border-collapse:collapse; min-width:960px}
+thead th{
+  position:sticky; top:0; z-index:2; background:var(--surface-2);
+  font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--ink-3); font-weight:600;
+  text-align:left; padding:10px 12px; border-bottom:1px solid var(--line); white-space:nowrap;
+}
+thead th.r{text-align:right}
+tbody td{padding:11px 12px; border-bottom:1px solid var(--line-soft); vertical-align:middle}
+tbody tr.op{cursor:pointer}
+tbody tr.op:hover td{background:var(--surface-2)}
+tbody tr.op.open td{background:var(--surface-2)}
+td.name{min-width:190px}
+td.name .n1{font-weight:600; display:flex; align-items:center; gap:7px}
+td.name .caret{color:var(--ink-3); font-size:10px; transition:transform .18s ease; display:inline-block}
+tr.op.open .caret{transform:rotate(90deg)}
+td.name .note{font-size:11.5px; color:var(--ink-3); margin-top:2px; max-width:290px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+td.money{text-align:right; font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums; font-weight:500; white-space:nowrap}
+td.provcell{font-size:12.5px; color:var(--ink-2); white-space:nowrap}
+td.provcell .none{color:var(--ink-3)}
+
+.pill{display:inline-block; padding:3px 9px; border-radius:999px; font-size:11.5px; font-weight:600; white-space:nowrap; line-height:1.35}
+.s-neutro{background:var(--st-neutro-bg); color:var(--st-neutro-fg)}
+.s-curso{background:var(--st-curso-bg); color:var(--st-curso-fg)}
+.s-tercero{background:var(--st-tercero-bg); color:var(--st-tercero-fg)}
+.s-listo{background:var(--st-listo-bg); color:var(--st-listo-fg)}
+.s-ok{background:var(--st-ok-bg); color:var(--st-ok-fg)}
+.s-alto{background:var(--st-alto-bg); color:var(--st-alto-fg)}
+
+.meters{display:flex; gap:9px}
+.meter{width:42px}
+.meter .bar{height:6px; border-radius:3px; background:var(--surface-3); overflow:hidden}
+.meter .bar span{display:block; height:100%; background:var(--accent); border-radius:3px}
+.meter .cap{font-family:"IBM Plex Mono",monospace; font-size:10px; color:var(--ink-3); margin-top:3px; text-align:center; font-variant-numeric:tabular-nums}
+.meter.empty .bar span{background:var(--line)}
+.mhead{display:flex; gap:9px}
+.mhead span{width:42px; text-align:center; font-size:9.5px; letter-spacing:.04em}
+
+/* detalle */
+tr.detail td{padding:0; border-bottom:1px solid var(--line-soft); background:var(--surface-3)}
+.detail-inner{padding:16px 18px 20px; display:grid; grid-template-columns:repeat(auto-fit,minmax(215px,1fr)); gap:16px}
+.blk h4{margin:0 0 8px; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); font-family:"IBM Plex Sans",sans-serif; font-weight:600}
+.step{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:3.5px 0}
+.step .sl{font-size:12px; color:var(--ink-2); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.detail-note{grid-column:1/-1; font-size:12.5px; color:var(--ink-2); background:var(--surface); border:1px solid var(--line-soft); border-radius:8px; padding:10px 13px}
+.detail-note b{font-family:"IBM Plex Sans",sans-serif; font-weight:600; color:var(--ink); display:block; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); margin-bottom:3px}
+
+#tstbl{min-width:760px}
+#tstbl tbody td{padding:12px}
+#tstbl tbody tr:hover td{background:var(--surface-2)}
+#tstbl td.strong{color:var(--ink); font-weight:500}
+#tstbl tfoot td{padding:11px 12px; border-top:1px solid var(--line); background:var(--surface-2);
+  font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-3); font-weight:600}
+#tstbl tfoot td.money{font-size:13px; letter-spacing:0; text-transform:none; color:var(--ink)}
+.gmeter{display:flex; align-items:center; justify-content:flex-end; gap:8px}
+.gmeter .cap{font-family:"IBM Plex Mono",monospace; font-size:11px; color:var(--ink-3); font-variant-numeric:tabular-nums}
+.gmeter .bar{width:64px; height:6px; border-radius:3px; background:var(--surface-3); overflow:hidden}
+.gmeter .bar span{display:block; height:100%; background:var(--accent); border-radius:3px}
+.empty-state{padding:34px 18px; text-align:center; color:var(--ink-3); font-size:13px}
+footer.leg{display:flex; flex-wrap:wrap; gap:14px 20px; align-items:center; justify-content:space-between; color:var(--ink-3); font-size:11.5px}
+.legend{display:flex; flex-wrap:wrap; gap:7px}
+
+.tabs{display:flex; flex-wrap:wrap; gap:6px; border-bottom:1px solid var(--line); padding-bottom:0}
+.tabs button{font:inherit; font-size:13.5px; font-weight:500; color:var(--ink-3); background:transparent;
+  border:0; border-bottom:2px solid transparent; padding:9px 14px 10px; cursor:pointer; border-radius:6px 6px 0 0}
+.tabs button:hover{color:var(--ink-2); background:var(--surface-2)}
+.tabs button[aria-selected="true"]{color:var(--accent-ink); border-bottom-color:var(--accent); font-weight:600}
+.tab{display:flex; flex-direction:column; gap:16px}
+.tab[hidden]{display:none}
+.provblk{margin-bottom:22px}
+.provblk:last-child{margin-bottom:0}
+.provblk h3{font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3);
+  font-family:"IBM Plex Sans",sans-serif; font-weight:600; margin:0 0 8px}
+.provtbl{width:100%; border-collapse:collapse; min-width:0}
+.provtbl th{font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-3); font-weight:600;
+  text-align:left; padding:6px 10px; border-bottom:1px solid var(--line)}
+.provtbl th.r{text-align:right}
+.provtbl td{padding:9px 10px; border-bottom:1px solid var(--line-soft); font-size:13px; vertical-align:top}
+.provtbl td.r{text-align:right; font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums; white-space:nowrap}
+.provtbl td.ops{color:var(--ink-3); font-size:12px}
+.provtbl tr:last-child td{border-bottom:0}
+#conttbl{min-width:900px}
+#conttbl td, #histtbl td{font-size:12.5px}
+#conttbl tfoot td{padding:10px 12px; border-top:1px solid var(--line); background:var(--surface-2);
+  font-size:11px; color:var(--ink-3); font-weight:600; text-align:center; font-family:"IBM Plex Mono",monospace}
+#conttbl tfoot td.lbl{text-align:left; font-family:inherit; letter-spacing:.06em; text-transform:uppercase}
+#histtbl{min-width:860px}
+#gate{position:fixed; inset:0; display:flex; align-items:center; justify-content:center; padding:24px; background:var(--ground); z-index:100}
+#gateform{width:100%; max-width:380px; background:var(--surface); border:1px solid var(--line); border-radius:14px;
+  box-shadow:var(--shadow); padding:30px 30px 26px; display:flex; flex-direction:column; gap:12px}
+#gateform h1{font-size:25px; letter-spacing:-.01em; margin:0 0 2px}
+#gateform p{margin:0; font-size:12.5px; color:var(--ink-3); line-height:1.55}
+#gateform input{width:100%; font:inherit; font-size:14px; color:var(--ink); background:var(--surface-2);
+  border:1px solid var(--line); border-radius:8px; padding:11px 13px; margin-top:4px}
+#gateform button{width:100%; padding:11px}
+#gateerr{font-size:12.5px; color:var(--st-alto-fg); min-height:17px}
+#gateform.cargando button{opacity:.6; pointer-events:none}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div id="gate">
+  <form id="gateform" autocomplete="off">
+    <h1>Operaciones Kippon</h1>
+    <p>Documento interno. Escribe la contraseña del equipo para ver la información.</p>
+    <input type="password" id="pass" placeholder="Contraseña" autocomplete="current-password" required>
+    <button class="btn" type="submit" id="gatebtn">Entrar</button>
+    <div id="gateerr" role="alert"></div>
+  </form>
+</div>
+
+<div class="wrap" id="app" hidden>
+  <header class="top">
+    <div>
+      <h1>Kippon</h1>
+      <div class="sub">Pipeline y control de estructuración, leído directamente del archivo de seguimiento.</div>
+    </div>
+    <div class="filebar">
+      <div class="filechip"><span class="dot"></span><span id="fileinfo">—</span></div>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabs" role="tablist" aria-label="Secciones">
+    <button role="tab" data-tab="resumen" aria-selected="true">Resumen</button>
+    <button role="tab" data-tab="operaciones" aria-selected="false">Operaciones</button>
+    <button role="tab" data-tab="proveedores" aria-selected="false">Proveedores</button>
+    <button role="tab" data-tab="contratos" aria-selected="false">Contratos</button>
+    <button role="tab" data-tab="historico" aria-selected="false">Histórico</button>
+  </nav>
+
+  <div class="tab" id="tab-resumen">
+    <section class="kpis" id="kpis"></section>
+
+    <section class="card" id="tscard">
+      <div class="head">
+        <h2>Term Sheet firmado — mandatos asignados</h2>
+        <span class="eyebrow" id="tsnote"></span>
+      </div>
+      <div class="tablewrap"><table id="tstbl"><thead></thead><tbody></tbody><tfoot></tfoot></table></div>
+    </section>
+
+    <section class="card">
+      <div class="head"><h2>Pipeline por etapa</h2><span class="eyebrow" id="stagenote"></span></div>
+      <div class="body" id="stages"></div>
+    </section>
+  </div>
+
+  <div class="tab" id="tab-operaciones" hidden>
+    <section class="card">
+      <div class="head" style="flex-wrap:wrap">
+        <h2 id="tabletitle">Operaciones</h2>
+        <div class="controls">
+          <input class="search" id="q" type="search" placeholder="Buscar operación, despacho, fiduciario…">
+          <div class="seg" role="group" aria-label="Ordenar">
+            <button data-sort="etapa" aria-pressed="true">Etapa</button>
+            <button data-sort="monto" aria-pressed="false">Monto</button>
+            <button data-sort="nombre" aria-pressed="false">A–Z</button>
+          </div>
+          <label class="toggle"><input type="checkbox" id="showclosed"> Incluir cerradas y canceladas</label>
+        </div>
+      </div>
+      <div class="tablewrap"><table id="tbl"><thead></thead><tbody></tbody></table></div>
+    </section>
+  </div>
+
+  <div class="tab" id="tab-proveedores" hidden>
+    <section class="card">
+      <div class="head"><h2>Concentración por proveedor</h2><span class="eyebrow">Operaciones activas</span></div>
+      <div class="body" id="provs"></div>
+    </section>
+  </div>
+
+  <div class="tab" id="tab-contratos" hidden>
+    <section class="card">
+      <div class="head"><h2>Contratos por operación</h2><span class="eyebrow" id="contnote"></span></div>
+      <div class="tablewrap"><table id="conttbl"><thead></thead><tbody></tbody><tfoot></tfoot></table></div>
+    </section>
+  </div>
+
+  <div class="tab" id="tab-historico" hidden>
+    <section class="card">
+      <div class="head"><h2>Cerradas y canceladas</h2><span class="eyebrow" id="histnote"></span></div>
+      <div class="tablewrap"><table id="histtbl"><thead></thead><tbody></tbody></table></div>
+    </section>
+  </div>
+
+  <footer class="leg">
+    <div class="legend" id="legend"></div>
+    <div id="foot"></div>
+  </footer>
+</div>
+
+<script>
+/*CIFRADO_INICIO*/const CIFRADO = {"salt": "FZYbBIcYBXK4ehyrCw+A+A==", "iv": "ePW/uiGz5eoLnLAp", "iter": 250000, "datos": "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"};/*CIFRADO_FIN*/
+let SNAPSHOT = null;
+
+const b64 = s => Uint8Array.from(atob(s), c=>c.charCodeAt(0));
+
+async function descifrar(pass){
+  const enc = new TextEncoder();
+  const base = await crypto.subtle.importKey("raw", enc.encode(pass), "PBKDF2", false, ["deriveKey"]);
+  const key = await crypto.subtle.deriveKey(
+    {name:"PBKDF2", salt:b64(CIFRADO.salt), iterations:CIFRADO.iter, hash:"SHA-256"},
+    base, {name:"AES-GCM", length:256}, false, ["decrypt"]);
+  const claro = await crypto.subtle.decrypt({name:"AES-GCM", iv:b64(CIFRADO.iv)}, key, b64(CIFRADO.datos));
+  return JSON.parse(new TextDecoder().decode(claro));
+}
+
+function cryptoDisponible(){
+  return !!(window.crypto && window.crypto.subtle && window.crypto.subtle.importKey);
+}
+
+async function abrir(pass, recordar){
+  if(!cryptoDisponible()) throw new Error("sin-webcrypto");
+  SNAPSHOT = await descifrar(pass);
+  if(recordar){ try{ sessionStorage.setItem("mesa-pass", pass); }catch(e){} }
+  document.getElementById("gate").remove();
+  document.getElementById("app").hidden = false;
+  cargar(SNAPSHOT.sheets, SNAPSHOT.fileName);
+  irA(location.hash.slice(1) || "resumen");
+}
+
+/* ---------------- utilidades ---------------- */
+const norm = s => (s==null?"":String(s)).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim();
+const txt  = s => (s==null?"":String(s)).trim();
+
+const TERMINAL = ["completado","firmado","aprobado","aprobada"];
+const CLASE = [
+  [["completado","firmado","aprobado","aprobada","cerrada"], "s-ok"],
+  [["listo para firma","cotizacion recibida","en firma","ts firmado","en estructuracion","cierre / fondeo"], "s-listo"],
+  [["pendiente de tercero"], "s-tercero"],
+  [["cancelada"], "s-alto"],
+  [["pendiente","no iniciado","n/a"], "s-neutro"],
+];
+function claseEstado(v){
+  const n = norm(v);
+  if(!n) return "s-neutro";
+  for(const [vals,c] of CLASE) if(vals.includes(n)) return c;
+  return "s-curso";
+}
+const ABREV = {"analisis / comite":"Análisis","term sheet":"TS","administrador maestro":"Adm.",
+               "despacho legal":"Legal","fiduciario":"Fiduc.","cierre":"Cierre"};
+function abrev(nombre){
+  const n = norm(nombre);
+  for(const k in ABREV) if(n.includes(k)) return ABREV[k];
+  return nombre.length>7 ? nombre.slice(0,6)+"." : nombre;
+}
+function limpiaBloque(s){ return txt(s).replace(/^\d+\.\s*/,"").replace(/\s+/g," ")
+  .toLowerCase().replace(/(^|\s|\/)([a-záéíóúñ])/g,(m,a,b)=>a+b.toUpperCase()); }
+const fmtMXN = n => n==null ? "—" : (n>=1e6 ? "$"+(n/1e6).toFixed(n%1e6===0?0:1)+"M"
+                     : n>=1e3 ? "$"+(n/1e3).toFixed(0)+"k" : "$"+n.toFixed(0));
+const fmtFull = n => n==null ? "sin monto" : "$"+n.toLocaleString("es-MX")+" MXN";
+
+/* ---------------- modelo ---------------- */
+function construir(sheets){
+  const seg = sheets["Seguimiento"] || [];
+  const listas = sheets["Listas"] || [];
+
+  // vocabulario de estados y de proveedores desde la hoja Listas
+  const CAT_PROCESO = ["estadogeneral","simple","ts","cotizacion","contrato","proceso","firma"];
+  const estados = new Set(["pendiente","en proceso","completado","n/a","no iniciado"]);
+  const proveedores = new Set();
+  const cabLista = listas[1] || [];
+  cabLista.forEach((nombre,ci)=>{
+    if(nombre==null) return;
+    const destino = CAT_PROCESO.includes(norm(nombre)) ? estados : proveedores;
+    for(let r=2;r<listas.length;r++){
+      const v = listas[r] && listas[r][ci];
+      if(txt(v)) destino.add(norm(v));
+    }
+  });
+
+  // encabezados: fila 2 = bloques (combinados), fila 3 = columnas
+  const filaBloques = seg[1]||[], filaCols = seg[2]||[];
+  const ancho = Math.max(filaCols.length, ...seg.slice(3).map(r=>r?r.length:0), 0);
+  const cols=[]; let bloqueActual="";
+  for(let c=0;c<ancho;c++){
+    if(txt(filaBloques[c])) bloqueActual = txt(filaBloques[c]);
+    cols.push({i:c, head:txt(filaCols[c]), bloque:bloqueActual});
+  }
+  const iOp    = cols.findIndex(c=>norm(c.head).includes("operacion"));
+  const iMonto = cols.findIndex(c=>norm(c.head).startsWith("monto"));
+  const iEst   = cols.findIndex(c=>norm(c.head).includes("estado general"));
+  const iNota  = cols.findIndex(c=>norm(c.head).includes("nota"));
+  const generales = [iOp,iMonto,iEst,iNota];
+
+  const filas = seg.slice(3).filter(r=> r && txt(r[iOp]));
+
+  // clasificar cada columna: proveedor (nombres fuera del vocabulario de estados) o paso
+  cols.forEach(col=>{
+    if(generales.includes(col.i) || !col.head){ col.tipo="general"; return; }
+    const vals = filas.map(r=>norm(r[col.i])).filter(Boolean);
+    col.tipo = vals.some(v=> proveedores.has(v) && !estados.has(v)) ? "proveedor" : "paso";
+  });
+
+  const bloques=[];
+  cols.forEach(col=>{
+    if(col.tipo==="general" || !col.head) return;
+    let b = bloques.find(x=>x.nombre===col.bloque);
+    if(!b){ b={nombre:col.bloque, etiqueta:limpiaBloque(col.bloque), pasos:[], proveedor:null}; bloques.push(b); }
+    if(col.tipo==="proveedor" && b.proveedor==null) b.proveedor=col; else b.pasos.push(col);
+  });
+
+  const ordenEstados = [];
+  (listas.slice(2)).forEach(r=>{ if(r && txt(r[0])) ordenEstados.push(txt(r[0])); });
+
+  const ops = filas.map(r=>{
+    const estado = txt(r[iEst]);
+    const o = {
+      nombre: txt(r[iOp]),
+      monto: typeof r[iMonto]==="number" ? r[iMonto] : (parseFloat(String(r[iMonto]||"").replace(/[^0-9.]/g,""))||null),
+      estado, nota: txt(r[iNota]),
+      cerrada: ["cerrada","cancelada"].includes(norm(estado)),
+      cancelada: norm(estado)==="cancelada",
+      bloques: bloques.map(b=>{
+        const pasos = b.pasos.map(p=>({label:p.head, valor:txt(r[p.i])}));
+        const aplican = pasos.filter(p=>p.valor && norm(p.valor)!=="n/a");
+        const hechos  = aplican.filter(p=>TERMINAL.includes(norm(p.valor)));
+        const prov = b.proveedor ? txt(r[b.proveedor.i]) : "";
+        return {
+          etiqueta:b.etiqueta, abrev:abrev(b.etiqueta), pasos,
+          total:aplican.length, hechos:hechos.length,
+          proveedorCol: b.proveedor ? b.proveedor.head : null,
+          proveedor: prov && !estados.has(norm(prov)) ? prov : "",
+          proveedorEstado: prov && estados.has(norm(prov)) ? prov : ""
+        };
+      })
+    };
+    // ¿ya tiene term sheet firmado?
+    const idxTS = ordenEstados.findIndex(e=>norm(e)==="ts firmado");
+    o.idxEtapa = ordenEstados.findIndex(e=>norm(e)===norm(estado));
+    const bTS = o.bloques.find(b=>/term sheet|^ts$/.test(norm(b.etiqueta)));
+    const firmadoEnTS = bTS && bTS.pasos.some(p=>norm(p.valor)==="firmado");
+    o.tsFirmado = !o.cancelada && (firmadoEnTS || (idxTS>=0 && o.idxEtapa>=idxTS));
+    return o;
+  });
+
+  return {ops, bloques, ordenEstados};
+}
+
+/* ---------------- estado de la vista ---------------- */
+let M = null, orden = "etapa", incluirCerradas = false, busqueda = "", abiertas = new Set();
+
+function activas(){ return M.ops.filter(o=>!o.cerrada); }
+function visibles(){
+  let l = M.ops.filter(o=> incluirCerradas ? true : !o.cerrada);
+  if(busqueda){
+    const q = norm(busqueda);
+    l = l.filter(o=> norm(o.nombre).includes(q) || norm(o.estado).includes(q) || norm(o.nota).includes(q)
+                  || o.bloques.some(b=>norm(b.proveedor).includes(q)));
+  }
+  const idx = e => { const i = M.ordenEstados.findIndex(x=>norm(x)===norm(e)); return i<0?99:i; };
+  if(orden==="etapa")  l.sort((a,b)=> idx(a.estado)-idx(b.estado) || (b.monto||0)-(a.monto||0));
+  if(orden==="monto")  l.sort((a,b)=> (b.monto||0)-(a.monto||0));
+  if(orden==="nombre") l.sort((a,b)=> a.nombre.localeCompare(b.nombre,"es"));
+  return l;
+}
+
+/* ---------------- render ---------------- */
+function el(tag, cls, html){ const e=document.createElement(tag); if(cls)e.className=cls; if(html!=null)e.innerHTML=html; return e; }
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function renderKPIs(){
+  const act = activas();
+  const monto = act.reduce((s,o)=>s+(o.monto||0),0);
+  const sinMonto = act.filter(o=>o.monto==null).length;
+  const cuenta = e => M.ops.filter(o=>norm(o.estado)===norm(e)).length;
+  const enEstr = M.ordenEstados.filter(e=>["ts firmado","en estructuracion","cierre / fondeo"].includes(norm(e)))
+                   .reduce((s,e)=>s+cuenta(e),0);
+  const tarjetas = [
+    {k:"Operaciones activas", v:act.length, n:"de "+M.ops.length+" en el control", lead:true},
+    {k:"Monto en pipeline",  v:fmtMXN(monto), n: sinMonto? sinMonto+" sin monto capturado" : "suma de operaciones activas"},
+    {k:"Estructuración",     v:enEstr, n:"TS firmado en adelante"},
+    {k:"Cerradas",           v:cuenta("Cerrada"), n:"fondeadas"},
+    {k:"Canceladas",         v:M.ops.filter(o=>o.cancelada).length, n:"fuera del pipeline"},
+  ];
+  const cont = document.getElementById("kpis"); cont.innerHTML="";
+  tarjetas.forEach(t=>{
+    const c = el("div","kpi"+(t.lead?" lead":""));
+    c.append(el("div","k",esc(t.k)), el("div","v",esc(String(t.v))), el("div","n",esc(t.n)));
+    cont.append(c);
+  });
+}
+
+function renderStages(){
+  const cont = document.getElementById("stages"); cont.innerHTML="";
+  const lista = M.ordenEstados.length ? M.ordenEstados : [...new Set(M.ops.map(o=>o.estado))];
+  const conteos = lista.map(e=>{
+    const ops = M.ops.filter(o=>norm(o.estado)===norm(e));
+    return {e, n:ops.length, monto:ops.reduce((s,o)=>s+(o.monto||0),0)};
+  });
+  const max = Math.max(1, ...conteos.map(c=>c.n));
+  conteos.forEach(c=>{
+    const row = el("div","stage"+(c.n?"":" zero"));
+    row.append(el("div","lbl",esc(c.e)));
+    const tr = el("div","track"); const f = el("div","fill");
+    f.style.width = c.n ? Math.max(4,(c.n/max*100))+"%" : "0"; tr.append(f); row.append(tr);
+    row.append(el("div","val", c.n + (c.monto? "  ·  "+fmtMXN(c.monto) : "")));
+    row.title = c.e+": "+c.n+(c.n===1?" operación":" operaciones")+(c.monto?" · "+fmtFull(c.monto):"");
+    cont.append(row);
+  });
+  document.getElementById("stagenote").textContent = M.ops.length+" operaciones";
+}
+
+function renderTS(){
+  const thead=document.querySelector("#tstbl thead"), tbody=document.querySelector("#tstbl tbody"), tfoot=document.querySelector("#tstbl tfoot");
+  const provBloques = M.bloques.filter(b=>b.proveedor);
+  const lista = M.ops.filter(o=>o.tsFirmado).sort((a,b)=>(b.monto||0)-(a.monto||0));
+  thead.innerHTML=""; tbody.innerHTML=""; tfoot.innerHTML="";
+  const tr = el("tr");
+  tr.append(el("th",null,"Operación"), el("th","r","Monto de financiamiento"), el("th",null,"Estado general"));
+  provBloques.forEach(b=> tr.append(el("th",null,esc(b.proveedor.head))));
+  tr.append(el("th","r","Avance global"));
+  thead.append(tr);
+
+  if(!lista.length){
+    const trv=el("tr"); const td=el("td","empty-state","Ninguna operación tiene Term Sheet firmado todavía.");
+    td.colSpan=4+provBloques.length; trv.append(td); tbody.append(trv);
+    document.getElementById("tsnote").textContent="0 operaciones";
+    return;
+  }
+
+  lista.forEach(o=>{
+    const r = el("tr");
+    r.append(el("td","name",'<div class="n1">'+esc(o.nombre)+"</div>"));
+    const tdm=el("td","money",esc(fmtMXN(o.monto))); tdm.title=fmtFull(o.monto); r.append(tdm);
+    r.append(el("td",null,'<span class="pill '+claseEstado(o.estado)+'">'+esc(o.estado||"—")+"</span>"));
+    provBloques.forEach(b=>{
+      const bb=o.bloques.find(x=>x.etiqueta===b.etiqueta);
+      const v=bb&&bb.proveedor, est=bb&&bb.proveedorEstado;
+      r.append(el("td","provcell strong", v ? esc(v)
+        : (est? '<span class="pill '+claseEstado(est)+'">'+esc(est)+"</span>" : '<span class="none">Sin asignar</span>')));
+    });
+    const tot=o.bloques.reduce((s,b)=>s+b.total,0), hec=o.bloques.reduce((s,b)=>s+b.hechos,0);
+    const tda=el("td","money");
+    const box=el("div","gmeter");
+    const bar=el("div","bar"); const sp=el("span"); sp.style.width = tot? Math.round(hec/tot*100)+"%" : "0"; bar.append(sp);
+    box.append(el("span","cap", tot? hec+"/"+tot : "—"), bar);
+    tda.append(box); tda.title = tot? hec+" de "+tot+" pasos concluidos en todos los frentes" : "sin capturar";
+    r.append(tda);
+    tbody.append(r);
+  });
+
+  const total = lista.reduce((s,o)=>s+(o.monto||0),0);
+  const sinMonto = lista.filter(o=>o.monto==null).length;
+  const trf=el("tr");
+  trf.append(el("td",null,"Total"), el("td","money",esc(fmtMXN(total))));
+  const rest=el("td",null, sinMonto? sinMonto+" sin monto capturado":"");
+  rest.colSpan = 2+provBloques.length; trf.append(rest);
+  tfoot.append(trf);
+  document.getElementById("tsnote").textContent = lista.length+(lista.length===1?" operación":" operaciones")+" · "+fmtMXN(total);
+}
+
+function renderProvs(){
+  const cont = document.getElementById("provs"); cont.innerHTML="";
+  const act = activas();
+  M.bloques.filter(b=>b.proveedor).forEach(b=>{
+    const blk = el("div","provblk");
+    blk.append(el("h3",null,esc(b.proveedor.head)));
+    const agr = {};
+    act.forEach(o=>{
+      const bb = o.bloques.find(x=>x.etiqueta===b.etiqueta);
+      const nombre = bb && bb.proveedor ? bb.proveedor : "Sin asignar";
+      (agr[nombre] = agr[nombre] || {n:0, monto:0, ops:[]});
+      agr[nombre].n++; agr[nombre].monto += (o.monto||0); agr[nombre].ops.push(o.nombre);
+    });
+    const t = el("table","provtbl");
+    const th = el("tr");
+    th.append(el("th",null,"Proveedor"), el("th","r","Operaciones"), el("th","r","Monto"), el("th",null,"Cuáles"));
+    const thead = el("thead"); thead.append(th); t.append(thead);
+    const tb = el("tbody");
+    const filas = Object.entries(agr).sort((a,b2)=> (b2[1].monto-a[1].monto) || (b2[1].n-a[1].n));
+    filas.forEach(([nombre,d])=>{
+      const r = el("tr");
+      r.append(el("td",null,'<b>'+esc(nombre)+"</b>"));
+      r.append(el("td","r",String(d.n)));
+      const tdm = el("td","r",esc(fmtMXN(d.monto))); tdm.title = fmtFull(d.monto); r.append(tdm);
+      r.append(el("td","ops",esc(d.ops.join(", "))));
+      tb.append(r);
+    });
+    if(!filas.length){ const r=el("tr"); r.append(el("td",null,"Sin operaciones activas")); tb.append(r); }
+    t.append(tb); blk.append(t); cont.append(blk);
+  });
+}
+
+function bloqueLegal(){
+  return M.bloques.find(b=>/legal/.test(norm(b.etiqueta)));
+}
+
+function renderContratos(){
+  const thead=document.querySelector("#conttbl thead"), tbody=document.querySelector("#conttbl tbody"),
+        tfoot=document.querySelector("#conttbl tfoot");
+  thead.innerHTML=""; tbody.innerHTML=""; tfoot.innerHTML="";
+  const b = bloqueLegal();
+  const nota = document.getElementById("contnote");
+  if(!b){ nota.textContent="Sin bloque legal en el archivo"; return; }
+  const pasos = b.pasos;
+  const lista = activas().filter(o=>{
+    const bb = o.bloques.find(x=>x.etiqueta===b.etiqueta);
+    return bb && bb.pasos.some(p=>p.valor);
+  }).sort((a,b2)=>(b2.monto||0)-(a.monto||0));
+
+  const tr = el("tr");
+  tr.append(el("th",null,"Operación"), el("th",null,"Despacho"));
+  pasos.forEach(p=> tr.append(el("th",null,esc(p.head))));
+  thead.append(tr);
+
+  if(!lista.length){
+    const trv=el("tr"); const td=el("td","empty-state","Ninguna operación activa tiene contratos capturados todavía.");
+    td.colSpan=2+pasos.length; trv.append(td); tbody.append(trv);
+    nota.textContent="0 operaciones"; return;
+  }
+
+  lista.forEach(o=>{
+    const bb = o.bloques.find(x=>x.etiqueta===b.etiqueta);
+    const r = el("tr");
+    r.append(el("td","name",'<div class="n1">'+esc(o.nombre)+"</div>"));
+    r.append(el("td","provcell strong", bb.proveedor ? esc(bb.proveedor) : '<span class="none">Sin asignar</span>'));
+    bb.pasos.forEach(p=>{
+      r.append(el("td",null,'<span class="pill '+claseEstado(p.valor)+'">'+esc(p.valor||"—")+"</span>"));
+    });
+    tbody.append(r);
+  });
+
+  const trf = el("tr");
+  trf.append(el("td","lbl",'Concluidos'), el("td",null,""));
+  pasos.forEach((p,i)=>{
+    let firmados=0, aplican=0;
+    lista.forEach(o=>{
+      const v = o.bloques.find(x=>x.etiqueta===b.etiqueta).pasos[i].valor;
+      if(v && norm(v)!=="n/a"){ aplican++; if(TERMINAL.includes(norm(v))) firmados++; }
+    });
+    trf.append(el("td",null, aplican? firmados+"/"+aplican : "—"));
+  });
+  tfoot.append(trf);
+  nota.textContent = lista.length+(lista.length===1?" operación activa":" operaciones activas");
+}
+
+function renderHistorico(){
+  const thead=document.querySelector("#histtbl thead"), tbody=document.querySelector("#histtbl tbody");
+  thead.innerHTML=""; tbody.innerHTML="";
+  const provBloques = M.bloques.filter(b=>b.proveedor);
+  const lista = M.ops.filter(o=>o.cerrada).sort((a,b)=>(b.monto||0)-(a.monto||0));
+  const tr = el("tr");
+  tr.append(el("th",null,"Operación"), el("th","r","Monto"), el("th",null,"Estado"));
+  provBloques.forEach(b=> tr.append(el("th",null,esc(b.proveedor.head))));
+  tr.append(el("th",null,"Notas"));
+  thead.append(tr);
+  const nota = document.getElementById("histnote");
+  if(!lista.length){
+    const trv=el("tr"); const td=el("td","empty-state","Todavía no hay operaciones cerradas ni canceladas.");
+    td.colSpan=4+provBloques.length; trv.append(td); tbody.append(trv);
+    nota.textContent="0 operaciones"; return;
+  }
+  lista.forEach(o=>{
+    const r = el("tr");
+    r.append(el("td","name",'<div class="n1">'+esc(o.nombre)+"</div>"));
+    const tdm=el("td","money",esc(fmtMXN(o.monto))); tdm.title=fmtFull(o.monto); r.append(tdm);
+    r.append(el("td",null,'<span class="pill '+claseEstado(o.estado)+'">'+esc(o.estado||"—")+"</span>"));
+    provBloques.forEach(b=>{
+      const bb=o.bloques.find(x=>x.etiqueta===b.etiqueta);
+      r.append(el("td","provcell", bb && bb.proveedor ? esc(bb.proveedor) : '<span class="none">—</span>'));
+    });
+    r.append(el("td",null,esc(o.nota||"—")));
+    tbody.append(r);
+  });
+  const cerradas = lista.filter(o=>!o.cancelada).length;
+  nota.textContent = cerradas+" cerradas · "+(lista.length-cerradas)+" canceladas";
+}
+
+function renderTable(){
+  const thead = document.querySelector("#tbl thead"), tbody = document.querySelector("#tbl tbody");
+  const bl = M.bloques;
+  thead.innerHTML = "";
+  const tr = el("tr");
+  tr.append(el("th",null,"Operación"), el("th","r","Monto"), el("th",null,"Estado general"));
+  bl.filter(b=>b.proveedor).forEach(b=> tr.append(el("th",null,esc(b.proveedor.head))));
+  const th = el("th");
+  th.append(el("div",null,"Avance por frente"));
+  const mh = el("div","mhead");
+  bl.forEach(b=> mh.append(el("span",null,esc(b.abrev? b.abrev : abrev(b.etiqueta)))));
+  th.append(mh); tr.append(th);
+  thead.append(tr);
+
+  const lista = visibles();
+  tbody.innerHTML = "";
+  if(!lista.length){
+    const trv = el("tr"); const td = el("td","empty-state","No hay operaciones que coincidan con el filtro.");
+    td.colSpan = 4 + bl.filter(b=>b.proveedor).length; trv.append(td); tbody.append(trv);
+  }
+  lista.forEach(o=>{
+    const r = el("tr","op"+(abiertas.has(o.nombre)?" open":""));
+    r.tabIndex = 0;
+    const tdn = el("td","name");
+    tdn.append(el("div","n1",'<span class="caret">▶</span>'+esc(o.nombre)));
+    if(o.nota) { const nn = el("div","note",esc(o.nota)); nn.title = o.nota; tdn.append(nn); }
+    r.append(tdn);
+    const tdm = el("td","money",esc(fmtMXN(o.monto))); tdm.title = fmtFull(o.monto); r.append(tdm);
+    r.append(el("td",null,'<span class="pill '+claseEstado(o.estado)+'">'+esc(o.estado||"—")+"</span>"));
+    bl.filter(b=>b.proveedor).forEach(b=>{
+      const bb = o.bloques.find(x=>x.etiqueta===b.etiqueta);
+      const v = bb && bb.proveedor;
+      const est = bb && bb.proveedorEstado;
+      r.append(el("td","provcell", v ? esc(v) : (est? '<span class="pill '+claseEstado(est)+'">'+esc(est)+"</span>" : '<span class="none">Sin asignar</span>')));
+    });
+    const tdav = el("td");
+    const box = el("div","meters");
+    o.bloques.forEach(b=>{
+      const m = el("div","meter"+(b.total?"":" empty"));
+      const bar = el("div","bar"); const sp = el("span");
+      sp.style.width = b.total ? Math.round(b.hechos/b.total*100)+"%" : "0";
+      bar.append(sp); m.append(bar);
+      m.append(el("div","cap", b.total ? b.hechos+"/"+b.total : "—"));
+      m.title = b.etiqueta+": "+(b.total? b.hechos+" de "+b.total+" pasos concluidos" : "sin capturar");
+      box.append(m);
+    });
+    tdav.append(box); r.append(tdav);
+    tbody.append(r);
+
+    const det = el("tr","detail");
+    const tdd = el("td"); tdd.colSpan = 4 + bl.filter(b=>b.proveedor).length;
+    const inner = el("div","detail-inner");
+    o.bloques.forEach(b=>{
+      const d = el("div","blk");
+      d.append(el("h4",null, esc(b.etiqueta) + (b.proveedor? ' · <span style="color:var(--accent-ink)">'+esc(b.proveedor)+"</span>" : "")));
+      b.pasos.forEach(p=>{
+        const s = el("div","step");
+        const sl = el("div","sl",esc(p.label)); sl.title = p.label; s.append(sl);
+        s.append(el("div",null,'<span class="pill '+claseEstado(p.valor)+'">'+esc(p.valor||"sin capturar")+"</span>"));
+        d.append(s);
+      });
+      inner.append(d);
+    });
+    if(o.nota) inner.append(el("div","detail-note","<b>Notas</b>"+esc(o.nota)));
+    tdd.append(inner); det.append(tdd);
+    det.style.display = abiertas.has(o.nombre) ? "" : "none";
+    tbody.append(det);
+
+    const toggle = ()=>{
+      if(abiertas.has(o.nombre)) abiertas.delete(o.nombre); else abiertas.add(o.nombre);
+      r.classList.toggle("open"); det.style.display = abiertas.has(o.nombre) ? "" : "none";
+    };
+    r.addEventListener("click", toggle);
+    r.addEventListener("keydown", e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); toggle(); } });
+  });
+
+  const act = activas().length;
+  document.getElementById("tabletitle").textContent = incluirCerradas
+    ? "Operaciones — control completo" : "Operaciones activas";
+  document.getElementById("foot").textContent = lista.length+" operaciones en pantalla · "+act+" activas · "+M.ops.length+" en el control";
+}
+
+function renderLegend(){
+  const items = [["Concluido","s-ok"],["Listo / recibido","s-listo"],["En curso","s-curso"],
+                 ["Pendiente de tercero","s-tercero"],["Pendiente / no iniciado","s-neutro"],["Cancelada","s-alto"]];
+  const c = document.getElementById("legend"); c.innerHTML="";
+  items.forEach(([t,cl])=> c.append(el("span","pill "+cl, esc(t))));
+}
+
+function renderAll(){ renderKPIs(); renderTS(); renderStages(); renderProvs(); renderContratos(); renderHistorico(); renderTable(); renderLegend(); }
+
+/* ---------------- carga del snapshot ---------------- */
+function cargar(sheets, nombre){
+  M = construir(sheets); abiertas = new Set();
+  const sello = SNAPSHOT.savedAt && SNAPSHOT.savedAt !== "—" ? " · datos al "+SNAPSHOT.savedAt : "";
+  document.getElementById("fileinfo").textContent = nombre + sello;
+  renderAll();
+}
+document.getElementById("q").addEventListener("input", e=>{ busqueda = e.target.value; renderTable(); });
+document.getElementById("showclosed").addEventListener("change", e=>{ incluirCerradas = e.target.checked; renderTable(); });
+document.querySelectorAll(".seg button").forEach(b=> b.addEventListener("click", ()=>{
+  orden = b.dataset.sort;
+  document.querySelectorAll(".seg button").forEach(x=> x.setAttribute("aria-pressed", String(x===b)));
+  renderTable();
+}));
+
+/* ---------------- pestañas ---------------- */
+const botonesTab = [...document.querySelectorAll("#tabs button")];
+function irA(nombre){
+  const valido = botonesTab.some(b=>b.dataset.tab===nombre) ? nombre : "resumen";
+  botonesTab.forEach(b=>{
+    const activo = b.dataset.tab===valido;
+    b.setAttribute("aria-selected", String(activo));
+    document.getElementById("tab-"+b.dataset.tab).hidden = !activo;
+  });
+  if(location.hash.slice(1) !== valido) history.replaceState(null,"","#"+valido);
+  window.scrollTo({top:0, behavior:"instant"});
+}
+botonesTab.forEach(b=> b.addEventListener("click", ()=> irA(b.dataset.tab)));
+window.addEventListener("hashchange", ()=> irA(location.hash.slice(1)));
+
+const gform = document.getElementById("gateform");
+gform.addEventListener("submit", async e=>{
+  e.preventDefault();
+  const err = document.getElementById("gateerr");
+  const campo = document.getElementById("pass");
+  err.textContent = ""; gform.classList.add("cargando");
+  const intentos = [campo.value];
+  if(campo.value.trim() !== campo.value) intentos.push(campo.value.trim());
+  for(const p of intentos){
+    try{ await abrir(p, true); return; }
+    catch(ex){
+      if(ex && ex.message === "sin-webcrypto"){
+        gform.classList.remove("cargando");
+        err.innerHTML = "Este visor no permite descifrar. Abre el archivo directamente en Chrome, Edge o Safari (arrástralo a una pestaña del navegador), o ábrelo ya publicado en GitHub Pages.";
+        return;
+      }
+      if(!(ex instanceof DOMException)){
+        gform.classList.remove("cargando");
+        err.textContent = "No pude descifrar: " + (ex && ex.message ? ex.message : ex);
+        return;
+      }
+    }
+  }
+  gform.classList.remove("cargando");
+  err.textContent = "Contraseña incorrecta. Revisa mayúsculas y que no se haya colado un espacio.";
+  campo.select();
+});
+(async ()=>{
+  let guardada = null;
+  try{ guardada = sessionStorage.getItem("mesa-pass"); }catch(e){}
+  if(guardada){ try{ await abrir(guardada, false); }catch(ex){ try{ sessionStorage.removeItem("mesa-pass"); }catch(e){} } }
+  if(!cryptoDisponible()){
+    document.getElementById("gateerr").innerHTML =
+      "Este visor no permite descifrar. Abre el archivo directamente en Chrome, Edge o Safari, o ábrelo ya publicado en GitHub Pages.";
+  }
+  document.getElementById("pass").focus();
+})();
+</script>
