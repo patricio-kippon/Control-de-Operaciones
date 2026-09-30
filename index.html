@@ -238,7 +238,6 @@ footer.leg{display:flex; flex-wrap:wrap; gap:14px 20px; align-items:center; just
 .cond .ficha h4 small{font-family:"IBM Plex Sans",sans-serif; font-weight:500; font-size:10.5px; color:var(--ink-3); letter-spacing:.04em}
 .cond .par{display:flex; justify-content:space-between; gap:10px; padding:3px 0; font-size:12.5px}
 .cond .par span:first-child{color:var(--ink-3)}
-.cond .prosnota{margin-top:9px; padding-top:8px; border-top:1px dashed var(--line); font-size:11.5px; color:var(--ink-3); line-height:1.45}
 .cond .par span:last-child{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums; color:var(--ink)}
 .cond .hist{margin-top:10px; padding-top:9px; border-top:1px dashed var(--line)}
 .cond .histtit{font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-3); margin-bottom:4px}
@@ -1023,9 +1022,6 @@ function renderProspectos(){
         : (c.valor || "—");
       f.append(el("div","par","<span>"+esc(c.label)+"</span><span>"+esc(v)+"</span>"));
     });
-    const prov = o.bloques.map(b=>b.proveedor).filter(Boolean);
-    if(prov.length) f.append(el("div","par","<span>Mandatos</span><span>"+esc(prov.join(" · "))+"</span>"));
-    if(o.nota) f.append(el("div","prosnota", esc(o.nota)));
     rejilla.append(f);
   });
   cont.append(rejilla);
